@@ -1,4 +1,6 @@
-﻿namespace Exp.Finance
+﻿using System;
+
+namespace Exp.Finance
 {
     public class Security
     {
@@ -38,10 +40,6 @@
         {
             Underlying = underlying;
         }
-    }
-
-    public class Swap : Security
-    {
     }
 
     public enum OptionType

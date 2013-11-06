@@ -91,14 +91,50 @@ namespace Exp.Finance
             }
         }
 
-        public static void ComputeEuropeanPayerSwaptionPrice()
+        public static void ComputeEuropeanPayerSwaptionPrice(Swaption swaption, double interestRate)
         {
-            
+            var swap = swaption.Underlying as PlainVanillaInterestRateSwap;
+            if (swap == null)
+                throw new ArgumentException("Need a plain vanilla IRS as the swaption's underlying.");
+            if (Math.Abs(swap.FixedRate - swaption.Strike) > double.Epsilon)
+                throw new ArgumentException("Fixed rate of a plain vanilla IRS underlying should equal to the strike rate.");
+
+            var tswap = swap.Tenor;
+            var flt = swap.FloatRate;
+            var fix = swap.FixedRate; // = swaption.Strike
+            var r = interestRate;
+            var t = swaption.TimeToMaturity;
+            var sig = swaption.Volatility; // the Black Implied Volatility, swaption maturity, forward tenor, and strike dependent
+            var m = swap.YearlyFloatPaymentCount;
+
+            var alpha = (1 - 1 / Math.Pow(1 + flt / m, tswap * m)) / flt;
+            var d1 = Math.Log(flt / fix) + (sig * sig / 2 * t);
+            var d2 = d1 - sig * Math.Sqrt(t);
+
+            swaption.Price = alpha * Math.Exp(-r * t) * (flt * N(d1) - fix * N(d2));
         }
 
-        public static void ComputeEuropeanReceiverSwaptionPrice()
+        public static void ComputeEuropeanReceiverSwaptionPrice(Swaption swaption, double interestRate)
         {
-            
+            var swap = swaption.Underlying as PlainVanillaInterestRateSwap;
+            if (swap == null)
+                throw new ArgumentException("Need a plain vanilla IRS as the swaption's underlying.");
+            if (Math.Abs(swap.FixedRate - swaption.Strike) > double.Epsilon)
+                throw new ArgumentException("Fixed rate of a plain vanilla IRS underlying should equal to the strike rate.");
+
+            var tswap = swap.Tenor;
+            var flt = swap.FloatRate;
+            var fix = swap.FixedRate; // = swaption.Strike
+            var r = interestRate;
+            var t = swaption.TimeToMaturity;
+            var sig = swaption.Volatility; // the Black Implied Volatility, swaption maturity, forward tenor, and strike dependent
+            var m = swap.YearlyFloatPaymentCount;
+
+            var alpha = (1 - 1 / Math.Pow(1 + flt / m, tswap * m)) / flt;
+            var d1 = Math.Log(flt / fix) + (sig * sig / 2 * t);
+            var d2 = d1 - sig * Math.Sqrt(t);
+
+            swaption.Price = alpha * Math.Exp(-r * t) * (fix * N(-d2) - flt * N(-d1));
         }
 
         private static double N(double d)
