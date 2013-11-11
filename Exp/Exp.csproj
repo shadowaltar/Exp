@@ -33,7 +33,32 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GurobiPlugin">
+      <HintPath>..\Libs\GurobiPlugin.dll</HintPath>
+    </Reference>
+    <Reference Include="LumenWorks.Framework.IO">
+      <HintPath>..\Libs\LumenWorks.Framework.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Solver.Foundation" />
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -57,15 +82,26 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Algorithms.cs" />
-    <Compile Include="Finance\BlackScholesPricer.cs" />
-    <Compile Include="Finance\Measures.cs" />
-    <Compile Include="Finance\Option.cs" />
+    <Compile Include="InstrumentTypes\Derivatives.cs" />
+    <Compile Include="InstrumentTypes\Forward.cs" />
+    <Compile Include="InstrumentTypes\Option.cs" />
+    <Compile Include="InstrumentTypes\Security.cs" />
+    <Compile Include="InstrumentTypes\Swap.cs" />
+    <Compile Include="InstrumentTypes\Swaption.cs" />
+    <Compile Include="Investments\Measures.cs" />
+    <Compile Include="Investments\Portfolios.cs" />
+    <Compile Include="Investments\SecuritiesCovariance.cs" />
     <Compile Include="Maths\Calculation.cs" />
     <Compile Include="Maths\CalculationExtensions.cs" />
     <Compile Include="Maths\Matrix.cs" />
     <Compile Include="Maths\Processes.cs" />
+    <Compile Include="QuantitativeFinance\BlackScholesPricer.cs" />
+    <Compile Include="QuantitativeFinance\ForwardPricer.cs" />
+    <Compile Include="QuantitativeFinance\InterestRateModel.cs" />
     <Compile Include="Utils\BetterRandom.cs" />
-    <Compile Include="Utils\Report.cs" />
+    <Compile Include="Utils\FileReaders.cs" />
+    <Compile Include="Utils\Heads.cs" />
+    <Compile Include="Utils\ReportTime.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -104,6 +140,11 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gurobi40.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Exp.Maths
 {
     public static class Calculation
     {
+        public static double DoubleEpsilon = 0.00000001;
+
         public static double DefiniteIntegralTrapezoidal(Func<double, double> func, double a, double b, int n = 100000)
         {
             double h = (b - a) / n;
@@ -128,6 +129,9 @@ namespace Exp.Maths
 
         public static double Mode(this List<double> values)
         {
+            if (values ==null || values.Count==0)
+                throw new ArithmeticException();
+
             var groups = values.GroupBy(v => v);
             var maxCount = groups.Max(g => g.Count());
             return groups.First(g => g.Count() == maxCount).Key;

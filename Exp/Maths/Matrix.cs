@@ -8,12 +8,12 @@ namespace Exp.Maths
     {
         private readonly double[,] matrix;
 
-        private Matrix(double[,] values)
+        protected Matrix(double[,] values)
         {
             matrix = values;
         }
 
-        private Matrix(int m, int n)
+        protected Matrix(int m, int n)
         {
             matrix = new double[m, n];
         }
@@ -333,6 +333,54 @@ namespace Exp.Maths
                 sb.AppendLine("|");
             }
             return sb.ToString();
+        }
+    }
+
+    public class LabeledMatrix<T> : Matrix
+    {
+        public List<T> RowEntities { get; private set; }
+        public List<T> ColumnEntities { get; private set; }
+
+        protected LabeledMatrix(double[,] values)
+            : base(values)
+        {
+        }
+
+        protected LabeledMatrix(int m, int n)
+            : base(m, n)
+        {
+        }
+
+        public static LabeledMatrix<T> New(List<T> rowEntities, List<T> columnEntities)
+        {
+            var matrix = new LabeledMatrix<T>(rowEntities.Count, columnEntities.Count)
+            {
+                RowEntities = rowEntities,
+                ColumnEntities = columnEntities
+            };
+            return matrix;
+        }
+
+        public double Get(T rowEntity, T columnEntity)
+        {
+            if (!RowEntities.Contains(rowEntity) || !ColumnEntities.Contains(columnEntity))
+            {
+                throw new ArgumentException();
+            }
+            var i = RowEntities.IndexOf(rowEntity);
+            var j = ColumnEntities.IndexOf(columnEntity);
+            return this[i, j];
+        }
+
+        public void Set(T rowEntity, T columnEntity, double value)
+        {
+            if (!RowEntities.Contains(rowEntity) || !ColumnEntities.Contains(columnEntity))
+            {
+                throw new ArgumentException();
+            }
+            var i = RowEntities.IndexOf(rowEntity);
+            var j = ColumnEntities.IndexOf(columnEntity);
+            this[i, j] = value;
         }
     }
 }
