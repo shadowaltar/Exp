@@ -85,9 +85,11 @@
     <Compile Include="InstrumentTypes\Derivatives.cs" />
     <Compile Include="InstrumentTypes\Forward.cs" />
     <Compile Include="InstrumentTypes\Option.cs" />
+    <Compile Include="InstrumentTypes\Rates.cs" />
     <Compile Include="InstrumentTypes\Security.cs" />
     <Compile Include="InstrumentTypes\Swap.cs" />
     <Compile Include="InstrumentTypes\Swaption.cs" />
+    <Compile Include="Investments\Hedges.cs" />
     <Compile Include="Investments\Measures.cs" />
     <Compile Include="Investments\Portfolios.cs" />
     <Compile Include="Investments\SecuritiesCovariance.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="QuantitativeFinance\ForwardPricer.cs" />
     <Compile Include="QuantitativeFinance\InterestRateModel.cs" />
     <Compile Include="Utils\BetterRandom.cs" />
+    <Compile Include="Utils\ExceptionExtensions.cs" />
     <Compile Include="Utils\FileReaders.cs" />
     <Compile Include="Utils\Heads.cs" />
     <Compile Include="Utils\ReportTime.cs" />

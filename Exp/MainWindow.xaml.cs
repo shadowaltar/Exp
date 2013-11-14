@@ -25,7 +25,7 @@ namespace Exp
         public MainWindow()
         {
             InitializeComponent();
-            Test();
+            //Test();
         }
 
         private void Test()
@@ -37,7 +37,7 @@ namespace Exp
             using (new ReportTime())
             {
                 Dictionary<Security, double> weights;
-                var variance = Portfolios.ComputePortfolioMeanVariance(matrix, 9d, out weights, true);
+                var variance = Portfolios.ComputePortfolioMinimumVariance(matrix, 9d, out weights, true);
                 Console.WriteLine(weights.Aggregate("Weights:" + Environment.NewLine,
                     (str, pair) => str + (Environment.NewLine + pair.Key.Symbol + "," + pair.Value)));
                 Console.WriteLine("Variance: " + variance);

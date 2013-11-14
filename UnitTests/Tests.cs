@@ -22,7 +22,7 @@ namespace UnitTests
         {
             var numbers = new List<double> { 3, 3, 3, 3, 1, 1, 1, 1, 4 };
             var m = numbers.Mode();
-            Assert.Equals(m, 1d);
+            Assert.AreEqual(m, 3d);
         }
 
         [Test]
@@ -67,15 +67,15 @@ namespace UnitTests
         [Test]
         public void TestVarianceMatrix()
         {
-            var secs = FileReaders.ReadSecurities(@"C:\A\Experiments\Exp\securities.csv");
-            var covs = FileReaders.ReadCorrelations(@"C:\A\Experiments\Exp\correlations.csv", secs);
+            var secs = FileReaders.ReadSecurities(@"securities.csv");
+            var covs = FileReaders.ReadCorrelations(@"correlations.csv", secs);
 
             using (new ReportTime())
             {
                 Dictionary<Security, double> weights;
                 var expectedReturn = 9d;
                 var matrix = Portfolios.ComputeCovariances(covs);
-                var variance = Portfolios.ComputePortfolioMeanVariance(matrix, expectedReturn, out weights);
+                var variance = Portfolios.ComputePortfolioMinimumVariance(matrix, expectedReturn, out weights);
 
 
                 Console.WriteLine(weights.Aggregate("Weights:" + Environment.NewLine,
@@ -84,6 +84,17 @@ namespace UnitTests
                 Console.WriteLine("Variance: " + variance);
                 Console.WriteLine("Sharpe: " + expectedReturn / Math.Sqrt(variance));
             }
+        }
+
+        [Test]
+        public void TestComputeMinVarianceHedgingFuturesCount()
+        {
+            var orangeFutures = new Security { Id = 1, Price = 118.65, Symbol = "ORANGE_FUTURES", Volatility = 0.2 };
+            var grapefruitCommodity = new Security { Id = 1, Price = double.NaN, Symbol = "GRAPEFRUIT_COMMODITY", Volatility = 0.25 };
+            var secCov = new SecuritiesCovariance(orangeFutures, grapefruitCommodity, 0.7);
+            secCov.Compute();
+            var contractCount = Hedges.ComputeMinVarianceHedgingFuturesCount(Math.Pow(orangeFutures.Volatility, 2), secCov, 150000, 15000);
+            Console.WriteLine(contractCount);
         }
     }
 }
