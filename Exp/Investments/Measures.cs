@@ -12,12 +12,17 @@ namespace Exp.Investments
             return (end - start) / start;
         }
 
-        public double GetSharpeRatio(IList<double> values, IList<double> benchmarks)
+        public double GetSharpeRatio(IList<double> values, IList<double> benchmarkRates)
         {
-            if (values.Count != benchmarks.Count)
+            if (values.Count != benchmarkRates.Count)
                 throw new ArgumentException();
-            var diffs = values.Select((t, i) => t - benchmarks[i]).ToList();
-            return diffs.Average() / Calculation.StandardDeviation(diffs);
+            var diffs = values.Select((t, i) => t - benchmarkRates[i]).ToList();
+            return diffs.Average() / diffs.StandardDeviation();
+        }
+
+        public double GetSharpeRatio(IList<double> values, double benchmarkRate)
+        {
+            return (values.Average() - benchmarkRate) / values.StandardDeviation();
         }
     }
 }

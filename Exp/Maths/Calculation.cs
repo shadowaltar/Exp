@@ -127,7 +127,7 @@ namespace Exp.Maths
             return result;
         }
 
-        public static double Mode(this List<double> values)
+        public static double Mode(this IList<double> values)
         {
             if (values ==null || values.Count==0)
                 throw new ArithmeticException();
@@ -137,7 +137,7 @@ namespace Exp.Maths
             return groups.First(g => g.Count() == maxCount).Key;
         }
 
-        public static double Variance(this List<double> values)
+        public static double Variance(this IList<double> values)
         {
             double result;
             if (values == null)
@@ -165,7 +165,7 @@ namespace Exp.Maths
             return result;
         }
 
-        public static double Variance(this List<int> values)
+        public static double Variance(this IList<int> values)
         {
             double result;
             if (values == null)
@@ -193,7 +193,7 @@ namespace Exp.Maths
             return result;
         }
 
-        public static decimal Variance(this List<decimal> values)
+        public static decimal Variance(this IList<decimal> values)
         {
             decimal result;
             if (values.Count < 2)
@@ -214,19 +214,19 @@ namespace Exp.Maths
             return result;
         }
 
-        public static double StandardDeviation(this List<double> values)
+        public static double StandardDeviation(this IList<double> values)
         {
             double r = Variance(values);
             return double.IsNaN(r) ? double.NaN : Math.Sqrt(r);
         }
 
-        public static double StandardDeviation(this List<int> values)
+        public static double StandardDeviation(this IList<int> values)
         {
             double r = Variance(values);
             return Math.Sqrt(r);
         }
 
-        public static decimal StandardDeviation(this List<decimal> values)
+        public static decimal StandardDeviation(this IList<decimal> values)
         {
             decimal r = Variance(values);
             return r.Sqrt();
