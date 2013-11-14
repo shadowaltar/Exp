@@ -95,6 +95,7 @@
     <Compile Include="Maths\CalculationExtensions.cs" />
     <Compile Include="Maths\Matrix.cs" />
     <Compile Include="Maths\Processes.cs" />
+    <Compile Include="QuantitativeFinance\BinomialPricer.cs" />
     <Compile Include="QuantitativeFinance\BlackScholesPricer.cs" />
     <Compile Include="QuantitativeFinance\ForwardPricer.cs" />
     <Compile Include="QuantitativeFinance\InterestRateModel.cs" />
