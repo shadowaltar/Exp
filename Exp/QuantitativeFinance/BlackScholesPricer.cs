@@ -32,7 +32,7 @@ namespace Exp.QuantitativeFinance
         {
             var sig = option.Volatility;
             var t = option.TimeToMaturity;
-            var s = option.Underlying.Price;
+            var s = option.Underlying.MarketPrice;
             var q = option.Underlying.YieldRate;
             var k = option.Strike;
             var r = interestRate;
@@ -45,7 +45,7 @@ namespace Exp.QuantitativeFinance
             var d2 = d1 - sigSqrtT;
             var nd1 = N(d1);
             var nd2 = N(d2);
-            option.Price = s * yieldDisc * nd1 - k * rateDisc * nd2;
+            option.MarketPrice = s * yieldDisc * nd1 - k * rateDisc * nd2;
 
             if (computeGreeks)
             {
@@ -65,7 +65,7 @@ namespace Exp.QuantitativeFinance
         {
             var sig = option.Volatility;
             var t = option.TimeToMaturity;
-            var s = option.Underlying.Price;
+            var s = option.Underlying.MarketPrice;
             var q = option.Underlying.YieldRate;
             var k = option.Strike;
             var r = interestRate;
@@ -78,7 +78,7 @@ namespace Exp.QuantitativeFinance
             var d2 = d1 - sigSqrtT;
             var nnd1 = N(-d1);
             var nnd2 = N(-d2);
-            option.Price = k * rateDisc * nnd2 - s * yieldDisc * nnd1;
+            option.MarketPrice = k * rateDisc * nnd2 - s * yieldDisc * nnd1;
 
             if (computeGreeks)
             {
@@ -113,7 +113,7 @@ namespace Exp.QuantitativeFinance
             var d1 = Math.Log(flt / fix) + (sig * sig / 2 * t);
             var d2 = d1 - sig * Math.Sqrt(t);
 
-            swaption.Price = alpha * Math.Exp(-r * t) * (flt * N(d1) - fix * N(d2));
+            swaption.MarketPrice = alpha * Math.Exp(-r * t) * (flt * N(d1) - fix * N(d2));
         }
 
         public static void ComputeEuropeanReceiverSwaptionPrice(Swaption swaption, double interestRate)
@@ -136,7 +136,7 @@ namespace Exp.QuantitativeFinance
             var d1 = Math.Log(flt / fix) + (sig * sig / 2 * t);
             var d2 = d1 - sig * Math.Sqrt(t);
 
-            swaption.Price = alpha * Math.Exp(-r * t) * (fix * N(-d2) - flt * N(-d1));
+            swaption.MarketPrice = alpha * Math.Exp(-r * t) * (fix * N(-d2) - flt * N(-d1));
         }
 
         private static double N(double d)

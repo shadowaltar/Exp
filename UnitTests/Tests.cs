@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Exp;
 using Exp.InstrumentTypes;
 using Exp.Investments;
 using Exp.Maths;
 using Exp.QuantitativeFinance;
 using Exp.Utils;
-using Moq;
-using NUnit;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -84,6 +80,56 @@ namespace UnitTests
                 Console.WriteLine("Variance: " + variance);
                 Console.WriteLine("Sharpe: " + expectedReturn / Math.Sqrt(variance));
             }
+        }
+
+        [Test]
+        public void TestAnnuity()
+        {
+            // single payment upfront, get FV.
+            var n = 6;
+            double notional = 10e7;
+            double r = 0.092;
+            var t1 = TimeValues.ComputeFutureValueOfOneTimeInvestment(notional, n, r);
+
+            // same but paying semiannually
+            var m = 2;
+            var t2 = TimeValues.ComputeFutureValueOfOneTimeInvestment(notional, n, m, r);
+
+            // FV of annuity
+            var pmt = 2 * 10e6;
+            r = 0.08;
+            n = 15;
+            var t3 = TimeValues.ComputeFutureValueOfCashFlows(pmt, n, r);
+
+            // PV of annuity
+            var fv = 5 * 10e6;
+            r = 0.1;
+            n = 7;
+            var t4 = TimeValues.ComputePresentValue(fv, n, r);
+
+            // PV of CFs
+            var pmts = new List<double> { 100, 100, 100, 100, 1100 };
+            r = .0625;
+            var t5 = TimeValues.ComputePresentValueOfCashFlows(pmts, r);
+
+            pmt = 100;
+            r = .09;
+            n = 8;
+            var t6 = TimeValues.ComputePresentValueOfCashFlows(100, n, r);
+
+            var couponRate = 0.05;
+            var faceValue = 1000;
+            var years = 20;
+            r = .11;
+            m = 2;
+            var bond = new Bond(faceValue, years, m, couponRate);
+            BondPricer.ComputePrice(bond, r);
+            var t7 = bond.FairPrice;
+
+        }
+
+        public void TestAccuredInterest()
+        {
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Exp.QuantitativeFinance
                 // not a no-arbitrage interest rate
                 return double.NaN;
             var p = (dr - d) / (u - d);
-            var s = option.Underlying.Price;
+            var s = option.Underlying.MarketPrice;
 
             var binomialValue = Math.Exp(-r * dt) * (p * childUpNode + (1 - p) * childDownNode);
 

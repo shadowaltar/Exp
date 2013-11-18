@@ -7,7 +7,7 @@ namespace Exp.QuantitativeFinance
     {
         public static double ComputeForwardPrice(Forward forward, double interestRate)
         {
-            var s = forward.Underlying.Price;
+            var s = forward.Underlying.MarketPrice;
             var q = forward.Underlying.YieldRate;
             var r = interestRate - q;
             var t = forward.Tenor;

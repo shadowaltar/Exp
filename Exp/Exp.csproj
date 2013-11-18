@@ -82,6 +82,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Algorithms.cs" />
+    <Compile Include="InstrumentTypes\Bond.cs" />
     <Compile Include="InstrumentTypes\Derivatives.cs" />
     <Compile Include="InstrumentTypes\Forward.cs" />
     <Compile Include="InstrumentTypes\Option.cs" />
@@ -93,14 +94,18 @@
     <Compile Include="Investments\SecuritiesCovariance.cs" />
     <Compile Include="Maths\Calculation.cs" />
     <Compile Include="Maths\CalculationExtensions.cs" />
+    <Compile Include="Maths\IrrCalculator.cs" />
     <Compile Include="Maths\Matrix.cs" />
     <Compile Include="Maths\Processes.cs" />
     <Compile Include="QuantitativeFinance\BinomialPricer.cs" />
     <Compile Include="QuantitativeFinance\BlackScholesPricer.cs" />
+    <Compile Include="QuantitativeFinance\BondPricer.cs" />
+    <Compile Include="QuantitativeFinance\TimeValues.cs" />
     <Compile Include="QuantitativeFinance\ForwardPricer.cs" />
     <Compile Include="QuantitativeFinance\InterestRateModel.cs" />
     <Compile Include="Utils\BetterRandom.cs" />
     <Compile Include="Utils\FileReaders.cs" />
+    <Compile Include="Utils\GenericExtensions.cs" />
     <Compile Include="Utils\Heads.cs" />
     <Compile Include="Utils\ReportTime.cs" />
     <Page Include="MainWindow.xaml">

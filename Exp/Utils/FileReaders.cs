@@ -19,7 +19,7 @@ namespace Exp.Utils
                     var sec = new Security();
                     sec.Id = int.Parse(reader[0]);
                     sec.Symbol = reader[1];
-                    sec.Price = double.Parse(reader[2]);
+                    sec.MarketPrice = double.Parse(reader[2]);
                     sec.Volatility = double.Parse(reader[3]);
                     sec.YieldRate = double.Parse(reader[4]);
                     results.Add(sec);

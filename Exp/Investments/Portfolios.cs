@@ -74,7 +74,7 @@ namespace Exp.Investments
                 model.AddDecisions(securityWeightDecision);
 
                 t1 += securityWeightDecision;
-                t2 += (securityWeightDecision * security.Price);
+                t2 += (securityWeightDecision * security.MarketPrice);
             }
 
             model.AddConstraint("SumOfWeights", t1 == 1d);

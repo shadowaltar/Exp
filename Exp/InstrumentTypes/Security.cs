@@ -6,7 +6,9 @@
 
         public string Symbol { get; set; }
 
-        public double Price { get; set; }
+        public double MarketPrice { get; set; }
+        public double FairPrice { get; set; }
+
         public double Volatility { get; set; }
         public double YieldRate { get; set; }
     }
