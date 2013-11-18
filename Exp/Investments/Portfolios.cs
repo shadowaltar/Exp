@@ -55,7 +55,7 @@ namespace Exp.Investments
             return sum;
         }
 
-        public static double ComputePortfolioMeanVariance(LabeledMatrix<Security> matrix, double expectedReturn, out Dictionary<Security, double> weights, bool allowShortSelling = false)
+        public static double ComputePortfolioMinimumVariance(LabeledMatrix<Security> matrix, double expectedReturn, out Dictionary<Security, double> weights, bool allowShortSelling = false)
         {
             SolverContext context = SolverContext.GetContext();
             Model model = context.CreateModel();
