@@ -81,15 +81,7 @@ namespace UnitTests
                 Console.WriteLine("Sharpe: " + expectedReturn / Math.Sqrt(variance));
             }
         }
-<<<<<<< .mine
-
         [Test]
-<<<<<<< HEAD
-=======
-
-        [Test]
-        public void TestComputeMinVarianceHedgingFuturesCount()
->>>>>>> .theirs
         public void TestAnnuity()
         {
             // single payment upfront, get FV.
@@ -98,7 +90,7 @@ namespace UnitTests
             double r = 0.092;
             var t1 = TimeValues.ComputeFutureValueOfOneTimeInvestment(notional, n, r);
 
-            // same but paying semiannually
+            // same but paying semi-annually
             var m = 2;
             var t2 = TimeValues.ComputeFutureValueOfOneTimeInvestment(notional, n, m, r);
 
@@ -134,34 +126,15 @@ namespace UnitTests
             var t7 = bond.FairPrice;
 
         }
-<<<<<<< .mine
 
-        public void TestAccuredInterest()
-        {
-=======
-=======
-    }
-
-
-
->>>>>>> .theirs
         public void TestComputeMinVarianceHedgingFuturesCount()
         {
-            var orangeFutures = new Security { Id = 1, Price = 118.65, Symbol = "ORANGE_FUTURES", Volatility = 0.2 };
-            var grapefruitCommodity = new Security { Id = 1, Price = double.NaN, Symbol = "GRAPEFRUIT_COMMODITY", Volatility = 0.25 };
+            var orangeFutures = new Security { Id = 1, MarketPrice = 118.65, Symbol = "ORANGE_FUTURES", Volatility = 0.2 };
+            var grapefruitCommodity = new Security { Id = 1, MarketPrice = double.NaN, Symbol = "GRAPEFRUIT_COMMODITY", Volatility = 0.25 };
             var secCov = new SecuritiesCovariance(orangeFutures, grapefruitCommodity, 0.7);
             secCov.Compute();
             var contractCount = Hedges.ComputeMinVarianceHedgingFuturesCount(Math.Pow(orangeFutures.Volatility, 2), secCov, 150000, 15000);
             Console.WriteLine(contractCount);
-<<<<<<< .mine
->>>>>>> ff101a9541e793d7183ffc058805a4491a72399e
-=======
-
->>>>>>> .theirs
         }
-<<<<<<< .mine
     }
-=======
-
->>>>>>> .theirs
 }
