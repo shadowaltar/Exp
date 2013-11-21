@@ -5,34 +5,30 @@ namespace Exp.QuantitativeFinance
 {
     public class BinomialPricer
     {
-        public static double ComputeOnePeriodTreeOptionPrice(Option option,
-            double interestRate, int periods, double childUpNode = 0, double childDownNode = 0)
+        public static double ComputeEuropeanOptionPrice(Option option,
+            double interestRate, int periods)
         {
             var t = option.TimeToMaturity;
-            var dt = t / periods;
             var r = interestRate;
-            var u = Math.Exp(option.Underlying.Volatility * Math.Sqrt(option.TimeToMaturity)); // u=e^(sig*sqrt(t))
+            var u = Math.Exp(option.Underlying.Volatility * Math.Sqrt(t / periods)); // u=e^(sig*sqrt(t))
             var d = 1 / u;
-            var dr = Math.Exp((interestRate - option.Underlying.YieldRate) * dt); // e^[(r-q)*dt]
-            if (dr < d || dr > u)
-                // not a no-arbitrage interest rate
-                return double.NaN;
-            var p = (dr - d) / (u - d);
-            var s = option.Underlying.MarketPrice;
 
-            var binomialValue = Math.Exp(-r * dt) * (p * childUpNode + (1 - p) * childDownNode);
+            var disc = Math.Pow(Math.Exp(-r * t / periods), periods); //1 / Math.Pow(1 + r, periods);
+            var s0 = option.Underlying.MarketPrice;
+            var p = ((r + 1) - d) / (u - d);
 
-            if (option.Style == OptionStyleType.American)
+            var result = 0.0;
+            for (int i = 0; i <= periods; i++)
             {
-                binomialValue = Math.Max(binomialValue, option.Strike);
+                var st = s0 * Math.Pow(d, i) * Math.Pow(u, periods - i);
+                var callValue = option.Payoff(st);
+
+                var prob = Math.Pow(p, periods - i) * Math.Pow(1 - p, i);
+                var coeff = Algorithms.BinomialCoefficient(periods, i);
+                result += (coeff * prob * callValue);
             }
-
-            var upPrice = s * u;
-            var downPrice = s * d;
-            var upPay = option.Payoff(upPrice);
-            var downPay = option.Payoff(downPrice);
-
-            throw new NotImplementedException();
+            result *= disc;
+            return result;
         }
     }
 }

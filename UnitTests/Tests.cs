@@ -138,5 +138,25 @@ namespace UnitTests
             var contractCount = Hedges.ComputeMinVarianceHedgingFuturesCount(Math.Pow(orangeFutures.Volatility, 2), secCov, 150000, 15000);
             Console.WriteLine(contractCount);
         }
+
+        [Test]
+        public void TestComputeEuropeanCallByBinomialModel()
+        {
+            var r = .02;
+            var option = new EuropeanCall
+            {
+                Strike = 95,
+                TimeToMaturity = 3,
+                Underlying = new Security { MarketPrice = 100, Volatility = .05827 },
+            };
+            var price = BinomialPricer.ComputeEuropeanCallPrice(option, r, 3);
+            Assert.Greater(price, 11.03);
+            Assert.Less(price, 11.04);
+
+            r = .04;
+            price = BinomialPricer.ComputeEuropeanCallPrice(option, r, 3);
+            Assert.Greater(price, 15.60);
+            Assert.Less(price, 15.65);
+        }
     }
 }
