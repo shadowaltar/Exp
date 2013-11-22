@@ -8,7 +8,7 @@ namespace Exp.QuantitativeFinance
 {
     public class BondPricer
     {
-        public static void ComputePrice(Bond bond, double constantAnnualInterestRate)
+        public static void Compute(Bond bond, double constantAnnualInterestRate)
         {
             var par = bond.FaceValue;
             var c = bond.CouponPayment;
@@ -34,7 +34,7 @@ namespace Exp.QuantitativeFinance
             cfs.Add(c + par); // cfn = last coupon + repaid par value
             bond.YieldRate = new IrrCalculator(cfs).Compute();
 
-            // compute maca dura
+            // compute maca/modified dura & dv01
             ComputeDuration(bond, r);
         }
 
@@ -130,11 +130,6 @@ namespace Exp.QuantitativeFinance
                 default:
                     throw new ArgumentException();
             }
-        }
-
-        public static ZeroCouponBond Convert(Bond bond)
-        {
-            throw new NotImplementedException();
         }
     }
 

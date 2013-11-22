@@ -1,8 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using NUnit.Framework;
 
 namespace Exp.InstrumentTypes
 {
-    public class Bond : Security
+    public interface BaseBond
+    {
+        DateTime Today { get; set; }
+        DateTime SettlementDate { get; set; }
+        int SettlementDayLag { get; set; }
+        Schedule Schedule { get; set; }
+
+        DateTime StartDate { get; }
+        DateTime EndDate { get; }
+        DateTime LastCouponDate { get; }
+        DateTime NextCouponDate { get; }
+        List<double> Coupons { get; set; }
+
+        double CurrentCouponRate { get; }
+
+        double FaceValue { get; }
+        double AccruedInterest { get; }
+    }
+
+    public class Bond : Security, BaseBond
     {
         /// <summary>
         /// Bond face value; also called par value.
@@ -33,8 +55,14 @@ namespace Exp.InstrumentTypes
         /// </summary>
         public double YieldToMaturity { get { return YieldRate; } }
 
+        /// <summary>
+        /// The weighted average time to maturity of all the cash flows from a bond.
+        /// </summary>
         public double MacauleyDuration { get; set; }
 
+        /// <summary>
+        /// The (opposite) change in the value of a the bond price in response to a change in the interest rate.
+        /// </summary>
         public double ModifiedDuration { get; set; }
 
         /// <summary>
@@ -42,6 +70,9 @@ namespace Exp.InstrumentTypes
         /// </summary>
         public double DollarDuration { get; set; }
 
+        /// <summary>
+        /// The duration which calculated the effect of embedded options.
+        /// </summary>
         public double EffectiveDuration { get; set; }
 
         public Bond(double faceValue, int years, int paymentsPerYear, double couponRate)
@@ -60,22 +91,98 @@ namespace Exp.InstrumentTypes
         }
     }
 
-    public class ZeroCouponBond : Bond
+    public class Schedule
     {
-        public ZeroCouponBond(double faceValue, int years)
-            : base(faceValue, years, 1, 0)
+        /// <summary>
+        /// Start dates of each period.
+        /// </summary>
+        public List<DateTime> FromDates { get; set; }
+        /// <summary>
+        /// End dates of each period.
+        /// </summary>
+        public List<DateTime> ToDates { get; set; }
+        /// <summary>
+        /// Payment dates of each period.
+        /// </summary>
+        public List<DateTime> PayDates { get; set; }
+
+        public DateTime FixingDate { get; set; }
+
+        /// <summary>
+        /// Start date of schedule.
+        /// </summary>
+        public DateTime StartDate { get; set; }
+        /// <summary>
+        /// End date of schedule.
+        /// </summary>
+        public DateTime EndDate { get; set; }
+
+        /// <summary>
+        /// Tenor
+        /// </summary>
+        public Tenor Tenor { get; set; }
+
+        public Rule GeneratorRule { get; set; }
+
+        public BusinessDayAdjustment RollAdjust { get; set; }
+        public BusinessDayAdjustment PayAdjust { get; set; }
+    }
+
+    public class FloatingSchedule : Schedule
+    {
+        /// <summary>
+        /// Payment dates of each period.
+        /// </summary>
+        public List<DateTime> FixingDates { get; set; }
+
+        /// <summary>
+        /// Lag of days to treat as business day, or rather T-X.
+        /// </summary>
+        public int BusinessDaysLag { get; set; }
+
+        /// <summary>
+        /// Leg from EndDate or StartDate.
+        /// </summary>
+        public bool IsArrears { get; set; }
+    }
+
+    public class BusinessDayAdjustment
+    {
+    }
+
+    public struct Tenor
+    {
+        public int Length { get; set; }
+        public TimeUnit TimeUnit { get; set; }
+
+        public bool Equals(Tenor other)
         {
+            return Length == other.Length && TimeUnit == other.TimeUnit;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is Tenor && Equals((Tenor)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Length * 397) ^ (int)TimeUnit;
+            }
+        }
+
+        public override string ToString()
+        {
+            return Length + TimeUnit.ToString();
         }
     }
 
-    public class DateSchedule
+    public enum TimeUnit
     {
-        public DateTime FixingDate { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public bool IsBusinessDaysAdjusted { get; set; }
-        public bool IsFixingDaysCountedFromTheEnd { get; set; }
-        public bool IsShortPeriodAt { get; set; }
+        M,
+        Y,
     }
 }

@@ -123,7 +123,7 @@ namespace UnitTests
             r = .11;
             m = 2;
             var bond = new Bond(faceValue, years, m, couponRate);
-            BondPricer.ComputePrice(bond, r);
+            BondPricer.Compute(bond, r);
             var t7 = bond.FairPrice;
 
         }
