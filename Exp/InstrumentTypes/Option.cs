@@ -1,4 +1,6 @@
-﻿namespace Exp.InstrumentTypes
+﻿using System;
+
+namespace Exp.InstrumentTypes
 {
     public abstract class Option : Derivatives
     {
@@ -32,6 +34,28 @@
         public new double YieldRate
         {
             get { return double.NaN; }
+        }
+    }
+
+    public class EuropeanCall : Option
+    {
+        public new OptionType Type { get { return OptionType.Call; } }
+        public new OptionStyleType Style { get { return OptionStyleType.European; } }
+
+        public override double Payoff(double underlyingPrice)
+        {
+            return Math.Max(0, underlyingPrice - Strike);
+        }
+    }
+
+    public class EuropeanPut : Option
+    {
+        public new OptionType Type { get { return OptionType.Put; } }
+        public new OptionStyleType Style { get { return OptionStyleType.European; } }
+
+        public override double Payoff(double underlyingPrice)
+        {
+            return Math.Max(0, Strike - underlyingPrice);
         }
     }
 

@@ -58,6 +58,9 @@
     <Reference Include="LumenWorks.Framework.IO">
       <HintPath>..\Libs\LumenWorks.Framework.IO.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\Libs\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Solver.Foundation" />
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
