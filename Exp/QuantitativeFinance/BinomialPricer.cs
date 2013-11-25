@@ -49,10 +49,7 @@ namespace Exp.QuantitativeFinance
             };
             root.DownRatioFormula = sec => 1 / root.ChildUpPossibility;
 
-            root.UpProbabilityFormula = sec =>
-            {
-                var 
-            }
+
 
             throw new NotImplementedException();
         }
