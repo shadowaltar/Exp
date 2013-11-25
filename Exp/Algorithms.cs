@@ -5,7 +5,7 @@ using Exp.Utils;
 
 namespace Exp
 {
-    public class Algorithms
+    public static class Algorithms
     {
         public static int BinarySearch(int input, List<int> values, bool ignoreDuplicates = false)
         {
@@ -76,6 +76,11 @@ namespace Exp
                     }
                 }
             }
+        }
+
+        public static List<T> Repeat<T>(this T value, int count)
+        {
+            return Enumerable.Repeat(value, count).ToList();
         }
 
         public static List<int> Sequence(int length)

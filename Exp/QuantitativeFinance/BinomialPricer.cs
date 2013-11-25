@@ -33,30 +33,130 @@ namespace Exp.QuantitativeFinance
             return result;
         }
 
-        public static double Compute(Option option, List<double> interestRates)
+        public static double Compute(Option option, List<double> interestRates, List<double> volatilities = null)
         {
             var n = interestRates.Count;
             var maturity = option.TimeToMaturity;
+            var t = maturity / n;
             var style = option.Style;
-            var payoffFunction = new Func<double, double>(option.Payoff);
-            var root = new BinomialLatticeNode();
-
-            root.UnderlyingValue = option.Underlying.MarketPrice;
-            root.UpRatioFormula = sec =>
+            var strike = option.Strike;
+            if (volatilities == null)
             {
-                var o = (Option)sec;
-                return Math.Exp(o.Underlying.Volatility * Math.Sqrt(maturity / n));
-            };
-            root.DownRatioFormula = sec => 1 / root.ChildUpPossibility;
+                volatilities = option.Underlying.Volatility.Repeat(n);
+            }
 
+            var lattice = new BinomialLattice(n);
 
+            lattice.InterestRates = interestRates;
+            lattice.UnderlyingVolatilities = volatilities;
+            lattice.DerivedValueFormulas = new Func<double, double>(option.Payoff).Repeat(n);
+
+            var node = new BinomialLatticeNode();
+            node.UnderlyingValue = option.Underlying.MarketPrice;
+            lattice.Root = node;
+
+            // from node to leaves; excludes root node
+            for (int stage = 1; stage <= n; stage++)
+            {
+                var r = lattice.InterestRates[stage];
+                var sig = lattice.UnderlyingVolatilities[stage];
+                var u = Math.Exp(sig * Math.Sqrt(t));
+                var d = 1 / u;
+                var p = (Math.Exp(r * t) - d) / (u - d);
+
+                var lowerNodeFactor = d / u;
+
+                var value = lattice[stage - 1][0].UnderlyingValue * u / lowerNodeFactor; // last topmost node. since there is a *d/u, here just *u/d; so intended to have *u only.
+
+                for (int i = 0; i < lattice[stage].Length; i++)
+                {
+                    lattice[stage][i] = new BinomialLatticeNode();
+
+                    node = lattice[stage][i];
+                    node.Stage = stage;
+                    node.Index = i;
+
+                    node.InterestRate = r;
+                    node.Volatility = sig;
+
+                    node.UpRatio = u;
+                    node.DownRatio = d;
+                    node.UpRiskNeutralProbability = p;
+                    node.DownRiskNeutralProbability = 1 - p;
+                    value *= lowerNodeFactor;
+                    node.UnderlyingValue = value; // each index = i+1 node equals its upper node (of index i) *d/u
+                }
+            }
+
+            for (int i = 0; i < lattice.Dimension; i++)
+            {
+                node = lattice.Get(lattice.Dimension, i);
+                node.DerivedValue = lattice.DerivedValueFormulas[lattice.Dimension](node.UnderlyingValue);
+            }
+
+            // from last 2nd level leaves to nodes; includes root node
+            for (int stage = n - 1; stage >= 0; stage--)
+            {
+                var disc = Math.Exp(-lattice.InterestRates[stage] * t);
+                var pUp = node.UpRiskNeutralProbability;
+                var pDown = node.DownRiskNeutralProbability;
+                for (int i = 0; i < lattice[stage].Length; i++)
+                {
+                    node = lattice[stage][i];
+                    var childUp = lattice[stage + 1][i]; // up child
+                    var childDown = lattice[stage + 1][i + 1]; // down child
+                    node.DerivedValue = disc * (pUp * childUp.DerivedValue + pDown * childDown.DerivedValue);
+                    if (style == OptionStyleType.American)
+                        node.DerivedValue = Math.Max(strike - node.UnderlyingValue, node.DerivedValue);
+                }
+            }
 
             throw new NotImplementedException();
         }
 
         private class BinomialLattice
         {
+            public int Dimension { get; private set; }
 
+            public BinomialLattice(int stages)
+            {
+                Dimension = stages;
+                Nodes = new BinomialLatticeNode[stages + 1][];
+                for (int i = 0; i < stages + 1; i++)
+                {
+                    Nodes[i] = new BinomialLatticeNode[i + 1];
+                }
+            }
+
+            public BinomialLatticeNode Root
+            {
+                get { return Nodes[0][0]; }
+                set { Nodes[0][0] = value; }
+            }
+
+            public BinomialLatticeNode[][] Nodes { get; private set; }
+
+            public List<double> InterestRates { get; set; }
+            public List<double> UnderlyingVolatilities { get; set; }
+
+            public List<Func<double, double>> DerivedValueFormulas { get; set; }
+
+            public BinomialLatticeNode[] this[int key]
+            {
+                get { return Nodes[key]; }
+            }
+
+            public BinomialLatticeNode Get(int stage, int index)
+            {
+                try
+                {
+                    return Nodes[stage][index];
+                }
+                catch (Exception e)
+                {
+                    throw new ArgumentException("Invalid stage or index of the lattice.", e);
+                }
+            }
         }
 
         private class BinomialLatticeNode
@@ -64,26 +164,17 @@ namespace Exp.QuantitativeFinance
             public int Stage { get; set; }
             public int Index { get; set; }
 
-            public List<double> InterestRates { get; set; } 
+            public double InterestRate { get; set; }
+            public double Volatility { get; set; }
 
-            public BinomialLattice ParentUp { get; set; }
-            public BinomialLattice ParentDown { get; set; }
-            public double PreviousStageInterestRate { get; set; }
+            public double UpRiskNeutralProbability { get; set; }
+            public double DownRiskNeutralProbability { get; set; }
 
-            public BinomialLattice ChildUp { get; set; }
-            public BinomialLattice ChildDown { get; set; }
-            public double NextStageInterestRate { get; set; }
-            public double ChildUpPossibility { get; set; }
-            public double ChildDownPossibility { get; set; }
+            public double UpRatio { get; set; }
+            public double DownRatio { get; set; }
 
             public double UnderlyingValue { get; set; }
             public double DerivedValue { get; set; }
-
-            public Func<Security, double> UpProbabilityFormula { get; set; }
-            public Func<Security, double> DownProbabilityFormula { get; set; }
-
-            public Func<Security, double> UpRatioFormula { get; set; }
-            public Func<Security, double> DownRatioFormula { get; set; }
         }
     }
 }
