@@ -1,35 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using NUnit.Framework;
 
 namespace Exp.InstrumentTypes
 {
-    public interface BaseBond
+    public class Bond : Security, IBond
     {
-        DateTime Today { get; set; }
-        DateTime SettlementDate { get; set; }
-        int SettlementDayLag { get; set; }
-        Schedule Schedule { get; set; }
+        public DateTime Today { get; set; }
+        public DateTime SettlementDate { get; set; }
+        public int SettlementDayLag { get; set; }
+        public Schedule Schedule { get; set; }
+        public DateTime StartDate { get; private set; }
+        public DateTime EndDate { get; private set; }
+        public DateTime LastCouponDate { get; private set; }
+        public DateTime NextCouponDate { get; private set; }
+        public List<double> Coupons { get; set; }
 
-        DateTime StartDate { get; }
-        DateTime EndDate { get; }
-        DateTime LastCouponDate { get; }
-        DateTime NextCouponDate { get; }
-        List<double> Coupons { get; set; }
+        public double CurrentCouponRate { get; private set; }
 
-        double CurrentCouponRate { get; }
-
-        double FaceValue { get; }
-        double AccruedInterest { get; }
-    }
-
-    public class Bond : Security, BaseBond
-    {
         /// <summary>
         /// Bond face value; also called par value.
         /// </summary>
         public double FaceValue { get; private set; }
+
+        public double AccruedInterest { get; private set; }
+
         /// <summary>
         /// Numbers of years to maturity.
         /// </summary>
@@ -89,6 +84,25 @@ namespace Exp.InstrumentTypes
             ModifiedDuration = double.NaN;
             DollarDuration = double.NaN;
         }
+    }
+
+    public interface IBond
+    {
+        DateTime Today { get; set; }
+        DateTime SettlementDate { get; set; }
+        int SettlementDayLag { get; set; }
+        Schedule Schedule { get; set; }
+
+        DateTime StartDate { get; }
+        DateTime EndDate { get; }
+        DateTime LastCouponDate { get; }
+        DateTime NextCouponDate { get; }
+        List<double> Coupons { get; set; }
+
+        double CurrentCouponRate { get; }
+
+        double FaceValue { get; }
+        double AccruedInterest { get; }
     }
 
     public class Schedule
