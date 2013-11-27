@@ -8,6 +8,11 @@ namespace Exp.Utils
         private readonly Stopwatch sw;
         private readonly string formattedString = "Used {0}";
 
+        public static ReportTime Start()
+        {
+            return new ReportTime();
+        }
+
         public ReportTime()
         {
             sw = new Stopwatch();

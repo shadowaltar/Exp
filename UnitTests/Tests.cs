@@ -66,7 +66,7 @@ namespace UnitTests
             var secs = FileReaders.ReadSecurities(@"securities.csv");
             var covs = FileReaders.ReadCorrelations(@"correlations.csv", secs);
 
-            using (new ReportTime())
+            using (ReportTime.Start())
             {
                 Dictionary<Security, double> weights;
                 var expectedReturn = 9d;
@@ -140,23 +140,60 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestComputeEuropeanCallByBinomialModel()
+        public void TestComputeAmericanCallByBinomialPricer()
         {
-            var r = .02;
-            var option = new EuropeanCall
+            var n = 15;
+            var rf = 0.02;
+            var option = new Option
             {
-                Strike = 95,
-                TimeToMaturity = 3,
-                Underlying = new Security { MarketPrice = 100, Volatility = .05827 },
+                Type = OptionType.Call,
+                Underlying = new Security { Volatility = 0.3, MarketPrice = 100, YieldRate = 0.01 },
+                Strike = 110,
+                TimeToMaturity = 0.25,
             };
-            var price = BinomialPricer.ComputeEuropeanCallPrice(option, r, 3);
-            Assert.Greater(price, 11.03);
-            Assert.Less(price, 11.04);
+            using (ReportTime.Start())
+            {
+                var price = BinomialPricer.Compute(option, rf, n);
+                Console.WriteLine(price);
+            }
+        }
 
-            r = .04;
-            price = BinomialPricer.ComputeEuropeanCallPrice(option, r, 3);
-            Assert.Greater(price, 15.60);
-            Assert.Less(price, 15.65);
+        [Test]
+        public void TestComputeAmericanPutByBinomialPricer()
+        {
+            var n = 15;
+            var rf = 0.02;
+            var option = new Option
+            {
+                Type = OptionType.Put,
+                Underlying = new Security { Volatility = 0.3, MarketPrice = 100, YieldRate = 0.01 },
+                Strike = 110,
+                TimeToMaturity = 0.25,
+            };
+            using (ReportTime.Start())
+            {
+                var price = BinomialPricer.Compute(option, rf, n);
+                Console.WriteLine(price);
+            }
+        }
+
+        [Test]
+        public void TestComputeAmericanCallOnFuturesByBinomialPricer()
+        {
+            var n = 15;
+            var rf = 0.02;
+            var option = new Option
+            {
+                Type = OptionType.Put,
+                Underlying = new Security { Volatility = 0.3, MarketPrice = 100, YieldRate = 0.01 },
+                Strike = 110,
+                TimeToMaturity = 0.25,
+            };
+            using (ReportTime.Start())
+            {
+                var price = BinomialPricer.Compute(option, rf, n);
+                Console.WriteLine(price);
+            }
         }
     }
 }
