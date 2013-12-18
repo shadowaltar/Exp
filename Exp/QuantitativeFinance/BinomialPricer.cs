@@ -33,35 +33,18 @@ namespace Exp.QuantitativeFinance
             return result;
         }
 
-
-        public static double Compute(Option option, double interestRate, int periods)
+        public static void ComputeOption(Option option, double interestRate, int periods)
         {
-            return Compute(option, interestRate.Repeat(periods));
-        }
-
-        public static double Compute(Option option, List<double> interestRates,
-            List<double> volatilities = null, List<double> underlyingYieldRates = null)
-        {
-            var n = interestRates.Count;
+            var n = periods;
             var maturity = option.TimeToMaturity;
             var dt = maturity / n;
             var style = option.Style;
             var strike = option.Strike;
-
-            if (volatilities == null)
-            {
-                volatilities = option.Underlying.Volatility.Repeat(n);
-            }
-            if (underlyingYieldRates == null)
-            {
-                underlyingYieldRates = option.Underlying.YieldRate.Repeat(n);
-            }
+            var q = option.Underlying.YieldRate;
+            var r = interestRate;
+            var sig = option.Underlying.Volatility;
 
             var lattice = new BinomialLattice(n);
-
-            lattice.InterestRates = interestRates;
-            lattice.UnderlyingVolatilities = volatilities;
-            lattice.UnderlyingYieldRates = underlyingYieldRates;
 
             var node = new BinomialLatticeNode
             {
@@ -71,14 +54,13 @@ namespace Exp.QuantitativeFinance
             };
 
             lattice.Root = node;
+            lattice.InterestRates[0] = r;
 
             // from node to leaves; excludes root node
             for (int stage = 0; stage <= n; stage++)
             {
                 var tempIndex = stage == n ? stage - 1 : stage;
-                var r = lattice.InterestRates[tempIndex];
-                var q = lattice.UnderlyingYieldRates[tempIndex];
-                var sig = lattice.UnderlyingVolatilities[tempIndex];
+
                 var u = Math.Exp(sig * Math.Sqrt(dt));
                 var d = 1 / u;
                 var p = (Math.Exp((r - q) * dt) - d) / (u - d);
@@ -94,6 +76,7 @@ namespace Exp.QuantitativeFinance
                     lattice[stage][i].DownRatio = d;
                     lattice[stage][i].UpRiskNeutralProbability = p;
                     lattice[stage][i].DownRiskNeutralProbability = 1 - p;
+                    lattice.InterestRates[stage] = r;
                 }
 
                 if (stage == n)
@@ -145,21 +128,36 @@ namespace Exp.QuantitativeFinance
                 }
             }
 
-            return lattice.Root.DerivedValue;
+            option.FairPrice = lattice.Root.DerivedValue;
         }
 
-        private class BinomialLattice
+        public static BinomialLattice GetShortRateLattice(double interestRate,
+            double upRatio, double downRatio, double upPossibility, int periods)
+        {
+            var lattice = new BinomialLattice(periods);
+            lattice.Root.UnderlyingValue = interestRate;
+            lattice.InterestRates[0] = lattice.Root.UnderlyingValue; // we are operating on the interest rates.
+            for (int i = 0; i < periods; i++)
+            {
+            }
+
+            return lattice;
+        }
+
+
+        public class BinomialLattice
         {
             public int Dimension { get; private set; }
 
-            public BinomialLattice(int stages)
+            public BinomialLattice(int periods)
             {
-                Dimension = stages;
-                Nodes = new BinomialLatticeNode[stages + 1][];
-                for (int i = 0; i < stages + 1; i++)
+                Dimension = periods;
+                Nodes = new BinomialLatticeNode[periods + 1][];
+                for (int i = 0; i < periods + 1; i++)
                 {
                     Nodes[i] = new BinomialLatticeNode[i + 1];
                 }
+                InterestRates = 0d.Repeat(periods + 1);
             }
 
             public BinomialLatticeNode Root
@@ -171,8 +169,6 @@ namespace Exp.QuantitativeFinance
             public BinomialLatticeNode[][] Nodes { get; private set; }
 
             public List<double> InterestRates { get; set; }
-            public List<double> UnderlyingVolatilities { get; set; }
-            public List<double> UnderlyingYieldRates { get; set; }
 
             public BinomialLatticeNode[] this[int key]
             {
@@ -192,7 +188,7 @@ namespace Exp.QuantitativeFinance
             }
         }
 
-        private class BinomialLatticeNode
+        public class BinomialLatticeNode
         {
             /// <summary>
             /// The index of period, starting from 0 (root) to n (period count).

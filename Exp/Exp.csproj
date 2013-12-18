@@ -105,6 +105,8 @@
     <Compile Include="QuantitativeFinance\BinomialPricer.cs" />
     <Compile Include="QuantitativeFinance\BlackScholesPricer.cs" />
     <Compile Include="QuantitativeFinance\BondPricer.cs" />
+    <Compile Include="InstrumentTypes\Mortgage.cs" />
+    <Compile Include="QuantitativeFinance\MbsPricer.cs" />
     <Compile Include="QuantitativeFinance\TimeValues.cs" />
     <Compile Include="QuantitativeFinance\ForwardPricer.cs" />
     <Compile Include="QuantitativeFinance\InterestRateModel.cs" />

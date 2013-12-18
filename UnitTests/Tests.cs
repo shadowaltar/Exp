@@ -153,13 +153,12 @@ namespace UnitTests
             };
             using (ReportTime.Start())
             {
-                var price = BinomialPricer.Compute(option, rf, n);
-                Console.WriteLine(price);
+                BinomialPricer.ComputeOption(option, rf, n);
             }
         }
 
         [Test]
-        public void TestComputeAmericanPutByBinomialPricer()
+        public static void TestComputeAmericanPutByBinomialPricer()
         {
             var n = 15;
             var rf = 0.02;
@@ -172,27 +171,9 @@ namespace UnitTests
             };
             using (ReportTime.Start())
             {
-                var price = BinomialPricer.Compute(option, rf, n);
-                Console.WriteLine(price);
-            }
-        }
-
-        [Test]
-        public void TestComputeAmericanCallOnFuturesByBinomialPricer()
-        {
-            var n = 15;
-            var rf = 0.02;
-            var option = new Option
-            {
-                Type = OptionType.Put,
-                Underlying = new Security { Volatility = 0.3, MarketPrice = 100, YieldRate = 0.01 },
-                Strike = 110,
-                TimeToMaturity = 0.25,
-            };
-            using (ReportTime.Start())
-            {
-                var price = BinomialPricer.Compute(option, rf, n);
-                Console.WriteLine(price);
+                BinomialPricer.ComputeOption(option, rf, n);
+                Assert.Greater(option.FairPrice, 2.60);
+                Assert.Less(option.FairPrice, 2.61);
             }
         }
     }
